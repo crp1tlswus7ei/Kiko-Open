@@ -37,26 +37,32 @@ class Sunban(commands.Cog):
          w_e = embed_(interaction, 'Invalid ID.', discord.Color.light_gray())
          await interaction.response.send_message(embed = w_e, ephemeral = True)
       except discord.Forbidden:
-         nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
+         nobot_perms = embed_(interaction, "Kiko can't do that !!!", discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
          await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
       except Exception as e:
-         print(f's-unban: {e}')
+         print(f'a-unban: [int(user_id)]; ({e})')
 
       banned_users = interaction.guild.bans()
-      async for ban_entry in banned_users:
-         user = ban_entry.user
-         if user.id == user_id:
-            await interaction.guild.unban(user)
-            unban_ = embed_(interaction, f'Unban: {user_id}', discord.Color.dark_green())
-            unban_.set_footer(text = f'Unban by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
-            await interaction.response.send_message(embed = unban_, ephemeral = False)
-            return
-
-      no_user = embed_(interaction, 'This ID does no exist.', discord.Color.light_gray())
-      no_user.set_footer(text = 'Make sure the ID is correct')
-      await interaction.response.send_message(embed = no_user, ephemeral = True)
-      return
+      try:
+         async for ban_entry in banned_users:
+            user = ban_entry.user
+            if user.id == user_id:
+               await interaction.guild.unban(user)
+               unban_ = embed_(interaction, f'Unban: {user_id}', discord.Color.dark_green())
+               unban_.set_footer(text = f'Unban by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
+               await interaction.response.send_message(embed = unban_, ephemeral = False)
+               return
+            else:
+               no_user = embed_(interaction, 'This ID does no exist.', discord.Color.light_gray())
+               no_user.set_footer(text='Make sure the ID is correct')
+               await interaction.response.send_message(embed=no_user, ephemeral=True)
+      except discord.Forbidden:
+         no_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
+         no_perms.set_footer(text = 'Check error documentation for more information.')
+         await interaction.response.send_message(embed = no_perms, ephemeral = True)
+      except Exception as e:
+         print(f'-a-unban: [guild.unban]; ({e})')
 
 async def setup(core):
    await core.add_cog(Sunban(core))

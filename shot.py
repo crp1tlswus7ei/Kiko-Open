@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 ints = discord.Intents.all() # Change later
-core = commands.Bot(command_prefix = '', intents = ints)
+core = commands.Bot(command_prefix = '', intents = ints, help_command = None)
 token = os.getenv('CORE_TOKEN')
 
 async def connect_():

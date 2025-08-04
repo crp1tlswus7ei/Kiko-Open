@@ -2,7 +2,7 @@ import asyncio
 import discord
 from discord import app_commands
 from discord.ext import commands
-from mdw.CreateRoles import CreateHardMuteRole, overMute
+from mdw.CreateRoles import CreateHardMuteRole, hm_overMute
 from utils.embeds import embed_
 
 class Shardmute(commands.Cog):
@@ -18,7 +18,7 @@ class Shardmute(commands.Cog):
       user = 'User to be sanctioned.',
       reason = 'Reason for sanction.'
    )
-   async def hardmute(self, interaction: discord.Interaction, user: discord.Member, reason: str = None):
+   async def hardmute(self, interaction: discord.Interaction, user: discord.Member, reason: str):
       if not interaction.user.guild_permissions.manage_roles:
          no_perms = embed_(interaction, 'You are not allowed to use this command.', discord.Color.light_gray())
          no_perms.set_footer(text = 'Permission required: manage_roles')
@@ -40,38 +40,60 @@ class Shardmute(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
-      h_role = discord.utils.get(interaction.guild.roles, name = 'Hard Mute')
-      if not h_role:
-         try:
-            await CreateHardMuteRole(interaction)
-            ch_role = embed_(interaction, 'Role was not found and was created automatically.', discord.Color.light_gray())
-            ch_role.set_footer(text = 'Check documentation for more info.')
-            await interaction.response.send_message(embed = ch_role, ephemeral = True)
+      m_role = discord.utils.get(interaction.guild.roles, name = 'Mute')
+      hm_role = discord.utils.get(interaction.guild.roles, name = 'Hard Mute')
 
-            for channel in interaction.guild.channels:
-               await channel.set_permissions(h_role, overwrite = overMute)
-
-         except discord.Forbidden:
-            nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
-            nobot_perms.set_footer(text = 'Check the error documentation.')
-            await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
-         except Exception as e:
-            print(f's-mute: {e}')
-
-      if h_role in user.roles:
-         alrm = embed_(interaction, 'User already muted', discord.Color.light_gray())
-         await interaction.response.send_message(embed = alrm, ephemeral = True)
+      if m_role in user.roles:
+         alr = embed_(interaction, f'{user.display_name} already muted.', discord.Color.light_gray())
+         await interaction.response.send_message(embed = alr, ephemeral = True)
          return
 
-      # d_role = user.guild.default_role
-      r_roles = [role for role in user.roles if role != user.guild.default.role]
+      if not hm_role:
+         try:
+            await CreateHardMuteRole(interaction)
+            hm_role = discord.utils.get(interaction.guild.roles, name = 'Hard Mute')
+            hm_rolec = embed_(interaction, 'Hard Mute role not found and was automatically created.', discord.Color.light_gray())
+            hm_rolec.set_footer(text = 'Check documentation for more information.')
+            await interaction.response.send_message(embed = hm_rolec, ephemeral = True)
 
-      await user.remove_roles(*r_roles, reason = reason)
-      await asyncio.sleep(2)
-      await user.add_roles(h_role, reason = 'Hard mute and remove all roles.')
-      hardmute_ = embed_(interaction, f'Hard Mute: {user.display_name}', discord.Color.light_gray())
-      hardmute_.set_footer(text = f'Hard Mute by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
-      await interaction.response.send_message(embed = hardmute_, ephemeral = False)
+            for channel in interaction.guild.channels:
+               try:
+                  await channel.set_permissions(target = hm_role, overwrite = hm_overMute)
+               except discord.Forbidden:
+                  noch_perms = embed_(interaction, 'Error modifying channel permissions.', discord.Color.dark_red())
+                  noch_perms.set_footer(text = 'Check error documentation for more information.')
+                  await interaction.response.send_message(embed = noch_perms, ephemeral = True)
+               except Exception as e:
+                  print(f'd-hardmute: [channel.set_permissions]; ({e})')
+                  return
+
+         except discord.Forbidden:
+            role_exc = embed_(interaction, 'Error creating or applying role.', discord.Color.dark_red())
+            role_exc.set_footer(text = 'Check error documentation for more information.')
+            await interaction.response.send_message(embed = role_exc, ephemeral = True)
+         except Exception as e:
+            print(f'd-hardmute: [CreateHardMuteRole]; ({e})')
+         return
+
+      rm_ = [r for r in user.roles if r != interaction.guild.default_role]
+      try:
+         if hm_role not in user.roles:
+            await user.remove_roles(*rm_, reason = 'Hard Mute')
+            await user.add_roles(hm_role, reason = reason)
+            hm_mute_ = embed_(interaction, f'{hm_role.name}: {user.display_name}', discord.Color.dark_green())
+            hm_mute_.set_footer(text = f'Hard Mute by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
+            await interaction.response.send_message(embed = hm_mute_, ephemeral = False)
+         else:
+            alr = embed_(interaction, f'{user.display_name} already muted.', discord.Color.light_gray())
+            await interaction.response.send_message(embed = alr, ephemeral = True)
+            return
+
+      except discord.Forbidden:
+         no_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
+         no_perms.set_footer(text = 'Check error documentation for more information.')
+         await interaction.response.send_message(embed = no_perms, ephemeral = True)
+      except Exception as e:
+         print(f'd-hardmute: [user.add_roles]; ({e})')
 
 async def setup(core):
    await core.add_cog(Shardmute(core))

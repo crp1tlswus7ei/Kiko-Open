@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from mdw.CreateRoles import CreateMuteRole, overMute
+from mdw.CreateRoles import CreateMuteRole, m_overMute
 from utils.embeds import embed_
 
 class Smute(commands.Cog):
@@ -10,7 +10,8 @@ class Smute(commands.Cog):
 
    @app_commands.command(
       name = 'mute',
-      description = 'Mutes a user indefinitely.'
+      description = 'Mutes a user indefinitely.',
+      nsfw = False
    )
    @app_commands.describe(
       user = 'User to be sanctioned.',
@@ -39,34 +40,56 @@ class Smute(commands.Cog):
          return
 
       m_role = discord.utils.get(interaction.guild.roles, name = 'Mute')
+      hm_role = discord.utils.get(interaction.guild.roles, name = 'Hard Mute')
+
+      if hm_role in user.roles:
+         alr = embed_(interaction, f'{user.display_name} already muted.', discord.Color.light_gray())
+         await interaction.response.send_message(embed = alr, ephemeral = True)
+         return
+
       if not m_role:
          try:
             await CreateMuteRole(interaction)
-            cmrole_ = embed_(interaction, 'Role was not found and was created automatically.', discord.Color.light_gray())
-            cmrole_.set_footer(text = 'Check documentation for more info.')
-            await interaction.response.send_message(embed = cmrole_, ephemeral = True)
+            m_role = discord.utils.get(interaction.guild.roles, name = 'Mute')
+            m_rolec = embed_(interaction, 'Mute role not found and was automatically created.', discord.Color.light_gray())
+            m_rolec.set_footer(text = 'Check documentation for more information.')
+            await interaction.response.send_message(embed = m_rolec, ephemeral = True)
 
             for channel in interaction.guild.channels:
-               await channel.set_permissions(m_role, overwrite = overMute)
+               try:
+                  await channel.set_permissions(m_role, overwrite = m_overMute)
+               except discord.Forbidden:
+                  noch_perms = embed_(interaction, 'Error modifying channel permissions.', discord.Color.dark_red())
+                  noch_perms.set_footer(text = 'Check error documentation for more information.')
+                  await interaction.response.send_message(embed = noch_perms, ephemeral = True)
+               except Exception as e:
+                  print(f'd-mute: [channe.set_permissions]; ({e})')
+                  return
 
          except discord.Forbidden:
-            nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
-            nobot_perms.set_footer(text = 'Check the error documentation.')
-            await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+            role_exc = embed_(interaction, 'Error creating or applying role.', discord.Color.dark_red())
+            role_exc.set_footer(text = 'Check error documentation for more information.')
+            await interaction.response.send_message(embed = role_exc, ephemeral = True)
          except Exception as e:
-            print(f's-mute: {e}')
-
-      if m_role in user.roles:
-         alrm = embed_(interaction, 'User already muted.', discord.Color.light_gray())
-         await interaction.response.send_message(embed = alrm, ephemeral = True)
+            print(f'd-mute: [CreateMuteRole]; ({e})')
          return
 
-      await user.add_roles(m_role, reason = reason)
-      mute_ = embed_(interaction, f'Mute: {user.display_name}', discord.Color.light_gray())
-      mute_.set_footer(text = f'Mute by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
-      await interaction.response.send_message(embed = mute_, ephemeral = False)
+      try:
+         if m_role not in user.roles:
+            await user.add_roles(m_role, reason = reason)
+            m_mute_ = embed_(interaction, f'{m_role.name}: {user.display_name}', discord.Color.dark_green())
+            m_mute_.set_footer(text = f'Mute by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
+            await interaction.response.send_message(embed = m_mute_, ephemeral = False)
+         else:
+            alr = embed_(interaction, f'{user.display_name} already muted.', discord.Color.light_gray())
+            await interaction.response.send_message(embed = alr, ephemeral = True)
+
+      except discord.Forbidden:
+         no_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
+         no_perms.set_footer(text = 'Check error documentation for more information.')
+         await interaction.response.send_message(embed = no_perms, ephemeral = True)
+      except Exception as e:
+         print(f'd-mute: [user.add_roles]; ({e})')
 
 async def setup(core):
    await core.add_cog(Smute(core))
-
-# Solved ECM (26-06-2025)
