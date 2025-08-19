@@ -21,7 +21,7 @@ async def connect_():
       print(f'DB error: {e}')
 
 async def load_():
-   for filename in os.listdir('./commands'):
+   for filename in os.listdir('commands'):
       if filename.endswith('.py'):
          await core.load_extension(f'commands.{filename[:-3]}')
 

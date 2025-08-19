@@ -3,6 +3,7 @@ from datetime import timedelta
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_, pdesc_
+from utils.buttons import DocButton
 
 class Stimeout(commands.Cog):
    def __init__(self, core):
@@ -46,6 +47,7 @@ class Stimeout(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
+      docs_button = DocButton()
       try:
          await user.timeout(timedelta(minutes = duration), reason = reason)
          timeout_ = pdesc_(interaction, f'Timeout: {user.display_name}', f'**Duration:** {duration} minutes.', discord.Color.dark_green())
@@ -54,6 +56,7 @@ class Stimeout(commands.Cog):
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-timeout: {e}')
 

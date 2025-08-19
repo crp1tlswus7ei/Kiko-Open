@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_
+from utils.buttons import DocButton
 
 class SclearW(commands.Cog):
    from mdw.WarnSys import get_warns, c_warns
@@ -46,6 +47,7 @@ class SclearW(commands.Cog):
          await interaction.response.send_message(embed = no_warns, ephemeral = True)
          return
 
+      docs_button = DocButton()
       try:
          self.c_warns(user_id)
          cw_ = embed_(interaction, f'{user.display_name} warns cleaned.', discord.Color.dark_green())
@@ -54,7 +56,7 @@ class SclearW(commands.Cog):
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-clear_warns: {e}')
 

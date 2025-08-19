@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_, pdesc_
+from utils.buttons import DocButton
 
 class Skick(commands.Cog):
    def __init__(self, core):
@@ -37,6 +38,7 @@ class Skick(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
+      docs_button = DocButton()
       try:
          await user.kick(reason = reason)
          kick_ = pdesc_(interaction, f'Kick: {user.display_name}', f'**id:** {user.id}', discord.Color.dark_green())
@@ -45,7 +47,7 @@ class Skick(commands.Cog):
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-kick: {e}')
 

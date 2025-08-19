@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_
+from utils.buttons import DocButton
 
 class Spurge(commands.Cog):
    def __init__(self, core):
@@ -39,6 +40,7 @@ class Spurge(commands.Cog):
       def c_user(msg):
          return msg.author.id == user.id
 
+      docs_button = DocButton()
       await interaction.response.defer(ephemeral = True)
       try:
          await interaction.channel.purge(limit = 7049, check = c_user)
@@ -48,7 +50,7 @@ class Spurge(commands.Cog):
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-purge: {e}')
 

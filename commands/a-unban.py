@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_
+from utils.buttons import DocButton
 
 class Sunban(commands.Cog):
    def __init__(self, core):
@@ -14,7 +15,7 @@ class Sunban(commands.Cog):
    @app_commands.describe(
       user_id = 'ID of the user to remove ban.'
    )
-   async def unban(self, interaction: discord.Interaction, user_id: int):
+   async def unban(self, interaction: discord.Interaction, *, user_id: str):
       if not interaction.user.guild_permissions.ban_members:
          no_perms = embed_(interaction, 'You are not allowed to use this command.', discord.Color.light_gray())
          no_perms.set_footer(text = 'Permission required: ban_members')
@@ -43,6 +44,7 @@ class Sunban(commands.Cog):
       except Exception as e:
          print(f'a-unban: [int(user_id)]; ({e})')
 
+      docs_button = DocButton()
       banned_users = interaction.guild.bans()
       try:
          async for ban_entry in banned_users:
@@ -60,7 +62,7 @@ class Sunban(commands.Cog):
       except discord.Forbidden:
          no_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          no_perms.set_footer(text = 'Check error documentation for more information.')
-         await interaction.response.send_message(embed = no_perms, ephemeral = True)
+         await interaction.response.send_message(embed = no_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f'-a-unban: [guild.unban]; ({e})')
 

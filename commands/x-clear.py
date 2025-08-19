@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_
+from utils.buttons import DocButton
 
 class Sclear(commands.Cog):
    def __init__(self, core):
@@ -27,16 +28,17 @@ class Sclear(commands.Cog):
          await interaction.response.send_message(embed = no_amount, ephemeral = True)
          return
 
+      docs_button = DocButton()
       await interaction.response.defer(ephemeral = True)
       try:
          await interaction.channel.purge(limit = amount)
          clear_ = embed_(interaction, f'{amount} message(s) deleted.', discord.Color.dark_green())
          clear_.set_footer(text = f'Clear by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
-         await interaction.followup.send(embed = clear_, ephemeral = False)
+         await interaction.followup.send(embed = clear_, ephemeral = True)
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-clear: {e}')
 

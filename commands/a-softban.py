@@ -3,6 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_, pdesc_
+from utils.buttons import DocButton
 
 class Ssoftban(commands.Cog):
    def __init__(self, core):
@@ -38,6 +39,7 @@ class Ssoftban(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
+      docs_button = DocButton()
       try:
          await user.ban(reason = reason)
          await asyncio.sleep(1)
@@ -48,7 +50,7 @@ class Ssoftban(commands.Cog):
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-soft_ban: {e}')
 

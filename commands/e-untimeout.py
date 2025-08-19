@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_
+from utils.buttons import DocButton
 
 class Suntimeout(commands.Cog):
    def __init(self, core):
@@ -37,6 +38,7 @@ class Suntimeout(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
+      docs_button = DocButton()
       try:
          await user.timeout(None) # !
          untimeout_ = embed_(interaction, f'Untimeout: {user.display_name}', discord.Color.dark_green())
@@ -45,7 +47,7 @@ class Suntimeout(commands.Cog):
       except discord.errors.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f's-untimeout: {e}')
 

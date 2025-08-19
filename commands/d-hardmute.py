@@ -4,6 +4,7 @@ from discord import app_commands
 from discord.ext import commands
 from mdw.CreateRoles import CreateHardMuteRole, hm_overMute
 from utils.embeds import embed_
+from utils.buttons import DocButton
 
 class Shardmute(commands.Cog):
    def __init__(self, core):
@@ -75,6 +76,7 @@ class Shardmute(commands.Cog):
             print(f'd-hardmute: [CreateHardMuteRole]; ({e})')
          return
 
+      docs_button = DocButton()
       rm_ = [r for r in user.roles if r != interaction.guild.default_role]
       try:
          if hm_role not in user.roles:
@@ -91,7 +93,7 @@ class Shardmute(commands.Cog):
       except discord.Forbidden:
          no_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          no_perms.set_footer(text = 'Check error documentation for more information.')
-         await interaction.response.send_message(embed = no_perms, ephemeral = True)
+         await interaction.response.send_message(embed = no_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f'd-hardmute: [user.add_roles]; ({e})')
 

@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from mdw.CreateRoles import CreateMuteRole, CreateHardMuteRole, hm_overMute, m_overMute
 from utils.embeds import embed_, pdesc_
+from utils.buttons import DocButton
 
 class Sunmute(commands.Cog):
    def __init__(self, core):
@@ -95,6 +96,7 @@ class Sunmute(commands.Cog):
             print(f'd-unmute: [CreateHardMuteRole]; ({e})')
          return
 
+      docs_button = DocButton()
       try:
          if m_role in user.roles:
             await user.remove_roles(m_role, reason = reason)
@@ -115,7 +117,7 @@ class Sunmute(commands.Cog):
       except discord.Forbidden:
          no_perms = embed_(interaction, 'Error removing roles.', discord.Color.dark_red())
          no_perms.set_footer(text = 'Check error documentation for more information.')
-         await interaction.response.send_message(embed = no_perms, ephemeral = True)
+         await interaction.response.send_message(embed = no_perms, ephemeral = True, view = docs_button)
       except Exception as e:
          print(f'd-unmute: [user.remove_roles]; ({e})')
 
