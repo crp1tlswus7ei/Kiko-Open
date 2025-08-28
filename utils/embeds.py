@@ -22,11 +22,22 @@ def pdesc_(
    )
    return embed
 
-def odesc(
+def odesc_(
         interaction: discord.Interaction,
         description: str,
         color: discord.Color) -> discord.Embed:
    embed = discord.Embed(
+      description = description,
+      color = color
+   )
+   return embed
+
+def noembed_(
+        title: str,
+        description: str,
+        color: discord.Color) -> discord.Embed:
+   embed = discord.Embed(
+      title = title,
       description = description,
       color = color
    )

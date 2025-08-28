@@ -50,7 +50,7 @@ class Sban(commands.Cog):
          nobot_perms.set_footer(text = 'Check the error documentation.')
          await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = doc_button)
       except Exception as e:
-         print(f's-ban: {e}')
+         print(f'a-ban: {e}')
 
 async def setup(core):
    await core.add_cog(Sban(core))

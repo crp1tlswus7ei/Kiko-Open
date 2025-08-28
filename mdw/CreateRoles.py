@@ -131,3 +131,11 @@ hm_overMute = discord.PermissionOverwrite(
    view_channel = True, #
    view_guild_insights = False
 )
+
+f_overLockdown = discord.PermissionOverwrite(
+   send_messages = False
+)
+
+f_overUnlock = discord.PermissionOverwrite(
+   send_messages = True
+)
