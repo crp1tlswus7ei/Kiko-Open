@@ -34,11 +34,11 @@ def odesc_(
 
 def noembed_(
         title: str,
-        description: str,
+        # description: str,
         color: discord.Color) -> discord.Embed:
    embed = discord.Embed(
       title = title,
-      description = description,
+      # description = description,
       color = color
    )
    return embed

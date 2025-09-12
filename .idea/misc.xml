@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (.Ok3.12u)" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Kiko-Open)" project-jdk-type="Python SDK" />
 </project>

@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils.embeds import embed_
 from utils.buttons import DocButton
 
-class Swarnings(commands.Cog):
+class Warnings(commands.Cog):
    from mdw.WarnSys import get_warns
    def __init__(self, core):
       self.core = core
@@ -30,9 +30,9 @@ class Swarnings(commands.Cog):
          return
 
       docs_button = DocButton()
+      user_id = str(user.id)
       try:
-         user_id = str(user.id)
-         user_warns = self.get_warns(user_id)
+         user_warns = self.get_warns(user_id) # false-positive
          if user_warns:
             warnn_ = embed_(interaction, f'{user.display_name} warns:\n' + '\n'.join(user_warns), discord.Color.dark_green())
             warnn_.set_footer(text = f'List requested by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
@@ -49,6 +49,7 @@ class Swarnings(commands.Cog):
          print(f's-warnings: {e}')
 
 async def setup(core):
-   await core.add_cog(Swarnings(core))
+   await core.add_cog(Warnings(core))
 
 # Solved ECM (26-06-2025)
+# 10/09/25

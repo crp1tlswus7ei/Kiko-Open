@@ -1,7 +1,7 @@
 import os
 import discord
 import asyncio
-from discord import PartialEmoji
+# from discord import PartialEmoji
 from discord.ext import commands
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -21,7 +21,7 @@ class Shot:
 
       @self.core.event
       async def on_ready():
-         print(f'Core: Online... as {self.core.user}')
+         print(f'Core: Online... as {self.core.user.display_name}')
          await self.core.change_presence(
             activity = discord.CustomActivity(
                name = 'In maintenance'

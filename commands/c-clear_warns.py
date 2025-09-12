@@ -3,11 +3,15 @@ from discord import app_commands
 from discord.ext import commands
 from utils.embeds import embed_
 from utils.buttons import DocButton
+from mdw.WarnSys import get_warns, c_warns
 
-class SclearW(commands.Cog):
-   from mdw.WarnSys import get_warns, c_warns
-   def __init__(self, core):
+class ClearWarns(commands.Cog):
+   def __init__(self, core, user: discord.Member):
       self.core = core
+      self.user = user
+      self.docs_button = DocButton()
+      self.user_id = str(user.id)
+      self.warns_ = get_warns(self.user_id) # false-positive
 
    @app_commands.command(
       name = 'clear_warns',
@@ -39,28 +43,25 @@ class SclearW(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
-      user_id = str(user.id)
-      warns_ = self.get_warns(user_id)
-
-      if not warns_:
+      if not self.warns_:
          no_warns = embed_(interaction, f'{user.display_name} has no warns to clean.', discord.Color.light_gray())
          await interaction.response.send_message(embed = no_warns, ephemeral = True)
          return
 
-      docs_button = DocButton()
       try:
-         self.c_warns(user_id)
+         c_warns(self.user_id)
          cw_ = embed_(interaction, f'{user.display_name} warns cleaned.', discord.Color.dark_green())
          cw_.set_footer(text = f'Clean by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
          await interaction.response.send_message(embed = cw_, ephemeral = False)
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = self.docs_button)
       except Exception as e:
          print(f's-clear_warns: {e}')
 
 async def setup(core):
-   await core.add_cog(SclearW(core))
+   await core.add_cog(ClearWarns(core, user))
 
 # Solved ECM (26-06-2025)
+# 10/09/25 NOT SOLVED

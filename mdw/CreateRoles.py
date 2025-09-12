@@ -1,5 +1,15 @@
 import discord
 
+async def CreateSpamRole(guild):
+   await guild.create_role(
+      name = 'Mute',
+      permissions = discord.Permissions(4296082432),
+      colour = discord.Colour.red(),
+      hoist = False,
+      mentionable = False,
+      reason = 'Spam Role.'
+   )
+
 async def CreateMuteRole(interaction: discord.Interaction):
    await interaction.guild.create_role(
       name = 'Mute',

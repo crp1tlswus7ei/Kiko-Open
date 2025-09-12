@@ -4,9 +4,11 @@ from discord.ext import commands
 from utils.embeds import embed_
 from utils.buttons import DocButton
 
-class Sunban(commands.Cog):
-   def __init__(self, core):
-        self.core = core
+class Unban(commands.Cog):
+   def __init__(self, core, interaction):
+      self.core = core
+      self.docs_button = DocButton()
+      self.banned_users = interaction.guild.bans()
 
    @app_commands.command(
       name = 'unban',
@@ -38,16 +40,15 @@ class Sunban(commands.Cog):
          w_e = embed_(interaction, 'Invalid ID.', discord.Color.light_gray())
          await interaction.response.send_message(embed = w_e, ephemeral = True)
       except discord.Forbidden:
-         nobot_perms = embed_(interaction, "Kiko can't do that !!!", discord.Color.dark_red())
+         nobot_perms = embed_(interaction, f"{self.core.user.display_name} can't do that !!!", discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check the error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = self.docs_button)
       except Exception as e:
          print(f'a-unban: [int(user_id)]; ({e})')
+         return
 
-      docs_button = DocButton()
-      banned_users = interaction.guild.bans()
       try:
-         async for ban_entry in banned_users:
+         async for ban_entry in self.banned_users:
             user = ban_entry.user
             if user.id == user_id:
                await interaction.guild.unban(user)
@@ -58,15 +59,16 @@ class Sunban(commands.Cog):
             else:
                no_user = embed_(interaction, 'This ID does no exist.', discord.Color.light_gray())
                no_user.set_footer(text='Make sure the ID is correct')
-               await interaction.response.send_message(embed=no_user, ephemeral=True)
+               await interaction.response.send_message(embed = no_user, ephemeral = True)
       except discord.Forbidden:
          no_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          no_perms.set_footer(text = 'Check error documentation for more information.')
-         await interaction.response.send_message(embed = no_perms, ephemeral = True, view = docs_button)
+         await interaction.response.send_message(embed = no_perms, ephemeral = True, view = self.docs_button)
       except Exception as e:
          print(f'-a-unban: [guild.unban]; ({e})')
 
 async def setup(core):
-   await core.add_cog(Sunban(core))
+   await core.add_cog(Unban(core))
 
 # Solved (26-06-2025)
+# 10/09/25

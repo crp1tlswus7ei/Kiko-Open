@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils.embeds import embed_
 from utils.buttons import DocButton
 
-class Sunwarn(commands.Cog):
+class Unwarn(commands.Cog):
    from mdw.WarnSys import get_warns, remove_warn
    def __init__(self, core):
         self.core = core
@@ -17,7 +17,7 @@ class Sunwarn(commands.Cog):
    @app_commands.describe(
       user = 'User to clean warns.'
    )
-   async def unwarn(self, interaction: discord.Interaction, user: discord.Member, amount: int):
+   async def unwarn(self, interaction: discord.Interaction, user: discord.Member, amount: int): # change amount to = 1
       if not interaction.user.guild_permissions.manage_roles:
          no_perms = embed_(interaction, 'You are not allowed to use this command.', discord.Color.light_gray())
          no_perms.set_footer(text = 'Permission required: manage_roles')
@@ -46,17 +46,17 @@ class Sunwarn(commands.Cog):
          return
 
       user_id = str(user.id)
-      warns_ = self.get_warns(user_id)
+      warns_ = self.get_warns(user_id) # false-positive
+      docs_button = DocButton()
 
       if not warns_:
          no_warns = embed_(interaction, f'{user.display_name} has no warns to remove.', discord.Color.light_gray())
          await interaction.response.send_message(embed = no_warns, ephemeral = True)
          return
 
-      docs_button = DocButton()
       try:
          if 1 <= amount <= len(warns_):
-            self.remove_warn(user_id, amount - 1)
+            self.remove_warn(user_id, amount - 1) # false-positive
             unwarn_ = embed_(interaction, f'{user.display_name} warn(s) removed.', discord.Color.dark_green())
             unwarn_.set_footer(text = f'Warns: {len(warns_) - 1}')
             await interaction.response.send_message(embed = unwarn_, ephemeral = False)
@@ -69,9 +69,7 @@ class Sunwarn(commands.Cog):
          nobot_perms.set_footer(text = 'Check the error documentation.')
          await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
       except Exception as e:
-         print(f's-unwarn: {e}')
+         print(f'c-unwarn: {e}')
 
 async def setup(core):
-   await core.add_cog(Sunwarn(core))
-
-# Solved ECM (26-06-2025)
+   await core.add_cog(Unwarn(core))

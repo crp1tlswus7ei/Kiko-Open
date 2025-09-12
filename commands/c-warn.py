@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils.embeds import embed_, pdesc_
 from utils.buttons import DocButton
 
-class Swarn(commands.Cog):
+class Warn(commands.Cog):
    from mdw.WarnSys import get_warns, add_warns
    def __init__(self, core):
       self.core = core
@@ -18,7 +18,7 @@ class Swarn(commands.Cog):
       user = 'User to be sanctioned.',
       reason = 'Reason for sanction.'
    )
-   async def warn(self, interaction: discord.Interaction, user: discord.Member, reason: str = None):
+   async def warn(self, interaction: discord.Interaction, user: discord.Member, *, reason: str):
       if not interaction.user.guild_permissions.manage_roles:
          no_perms = embed_(interaction, 'You are not allowed to use this command.', discord.Color.light_gray())
          no_perms.set_footer(text = 'Permission required: manage_roles.')
@@ -40,9 +40,9 @@ class Swarn(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
+      user_id = str(user.id)
       docs_button = DocButton()
       try:
-         user_id = str(user.id)
          total_warns = self.add_warns(user_id, reason = reason)
          warn_ = pdesc_(interaction, f'{user.display_name} has been warned.', f'**Warns:** {total_warns}', discord.Color.dark_green())
          warn_.set_footer(text = f'Warn by: {interaction.user.display_name}', icon_url = interaction.user.avatar)
@@ -55,6 +55,7 @@ class Swarn(commands.Cog):
          print(f's-warn: {e}')
 
 async def setup(core):
-   await core.add_cog(Swarn(core))
+   await core.add_cog(Warn(core))
 
 # Solved ECM (26-06-2025)
+# 10/09/25

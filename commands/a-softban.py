@@ -5,19 +5,20 @@ from discord.ext import commands
 from utils.embeds import embed_, pdesc_
 from utils.buttons import DocButton
 
-class Ssoftban(commands.Cog):
+class SoftBan(commands.Cog):
    def __init__(self, core):
       self.core = core
+      self.docs_button = DocButton()
 
    @app_commands.command(
-      name = 'softban',
+      name = 'soft-ban',
       description = 'Temporary sanction. Useful for deleting messages from a user.'
    )
    @app_commands.describe(
       user = 'User to be sanctioned',
       reason = 'Reason for sanction.'
    )
-   async def softban(self, interaction: discord.Interaction, user: discord.Member, reason: str):
+   async def softban(self, interaction: discord.Interaction, user: discord.Member, *, reason: str):
       if not interaction.user.guild_permissions.ban_members:
          no_perms = embed_(interaction, 'You are not allowed to use this command.', discord.Color.light_gray())
          no_perms.set_footer(text = 'Permission required: ban_members')
@@ -39,7 +40,6 @@ class Ssoftban(commands.Cog):
          await interaction.response.send_message(embed = insf_perms, ephemeral = True)
          return
 
-      docs_button = DocButton()
       try:
          await user.ban(reason = reason)
          await asyncio.sleep(1)
@@ -50,11 +50,12 @@ class Ssoftban(commands.Cog):
       except discord.Forbidden:
          nobot_perms = embed_(interaction, 'Error executing command.', discord.Color.dark_red())
          nobot_perms.set_footer(text = 'Check error documentation.')
-         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = docs_button)
+         await interaction.response.send_message(embed = nobot_perms, ephemeral = True, view = self.docs_button)
       except Exception as e:
-         print(f's-soft_ban: {e}')
+         print(f'a-soft_ban: {e}')
 
 async def setup(core):
-   await core.add_cog(Ssoftban(core))
+   await core.add_cog(SoftBan(core))
 
 # Solved ECM (26-06-2025)
+# 10/09/25

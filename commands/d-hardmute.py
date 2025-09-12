@@ -1,4 +1,3 @@
-import asyncio
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -6,12 +5,12 @@ from mdw.CreateRoles import CreateHardMuteRole, hm_overMute
 from utils.embeds import embed_
 from utils.buttons import DocButton
 
-class Shardmute(commands.Cog):
+class HardMute(commands.Cog):
    def __init__(self, core):
       self.core = core
 
    @app_commands.command(
-      name = 'hardmute',
+      name = 'hard-mute',
       description = 'Remove all roles from user and applies mute.',
       nsfw = False
    )
@@ -19,7 +18,7 @@ class Shardmute(commands.Cog):
       user = 'User to be sanctioned.',
       reason = 'Reason for sanction.'
    )
-   async def hardmute(self, interaction: discord.Interaction, user: discord.Member, reason: str):
+   async def hardmute(self, interaction: discord.Interaction, user: discord.Member, *, reason: str):
       if not interaction.user.guild_permissions.manage_roles:
          no_perms = embed_(interaction, 'You are not allowed to use this command.', discord.Color.light_gray())
          no_perms.set_footer(text = 'Permission required: manage_roles')
@@ -98,4 +97,4 @@ class Shardmute(commands.Cog):
          print(f'd-hardmute: [user.add_roles]; ({e})')
 
 async def setup(core):
-   await core.add_cog(Shardmute(core))
+   await core.add_cog(HardMute(core))
